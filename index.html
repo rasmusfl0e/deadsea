@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<title>slide-thing</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<style>
+			* {
+				padding: 0;
+				margin: 0;
+			}
+			html {
+				height: 100%;
+			}
+			body {
+				height: 100%;
+				overflow: hidden;
+			}
+			.slides {
+				height: 100%;
+			}
+			.slide {
+				position: absolute;
+				width: 100%;
+				height: 100%;
+				background-color: green;
+			}
+			.slide:nth-child(1) {
+				background-color: hsl(0, 100%, 50%);
+			}
+			.slide:nth-child(2) {
+				background-color: hsl(30, 100%, 50%);
+			}
+			.slide:nth-child(3) {
+				background-color: hsl(60, 100%, 50%);
+			}
+			.slide:nth-child(4) {
+				background-color: hsl(90, 100%, 50%);
+			}
+			.slide:nth-child(5) {
+				background-color: hsl(120, 100%, 50%);
+			}
+			.slide:nth-child(6) {
+				background-color: hsl(150, 100%, 50%);
+			}
+			.slide:nth-child(7) {
+				background-color: hsl(180, 100%, 50%);
+			}
+			.slide {
+				pointer-events: none;
+				transition: transform .3s ease-out;
+				transform: translate3d(0, -100%, 0);
+				z-index: 1;
+			}
+			.selected {
+				transform: translate3d(0, 0, 0);
+				z-index: 3;
+			}
+			.selected ~ .slide {
+				transform: translate3d(0, 100%, 0);
+				z-index: 1;
+			}
+			.selected + .slide {
+				z-index: 2;
+			}
+			p {
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				margin: 20px;
+				padding: 20px;
+				background-color: black;
+				color: #FFF;
+			}
+
+		</style>
+	</head>
+	<body>
+		<div class="slides">
+			<div class="slide selected">
+				<p>Testing 1</p>
+			</div>
+			<div class="slide">
+				<p>Testing 2</p>
+			</div>
+			<div class="slide">
+				<p>Testing 3</p>
+			</div>
+			<div class="slide">
+				<p>Testing 4</p>
+			</div>
+			<div class="slide">
+				<p>Testing 5</p>
+			</div>
+			<div class="slide">
+				<p>Testing 6</p>
+			</div>
+			<div class="slide">
+				<p>Testing 7</p>
+			</div>
+		</div>
+		<script src="./dist/index.js"></script>
+		<script>
+			deadsea(document.querySelector(".slides"));
+		</script>
+	</body>
+</html>
