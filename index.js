@@ -1,22 +1,25 @@
-module.exports = function (container) {
-	var slides = container.children;
+module.exports = function (container, options) {
+	var slides = container.children[0];
+	var count = slides.children.length;
 	var currentIndex = 0;
 
 	function go (index) {
-		if (index !== currentIndex && index > -1 && index < slides.length) {
-			slides[currentIndex].className = "slide";
-			slides[index].className = "slide selected";
-			currentIndex = index;
+		//window.console && console.log("go", index, currentIndex);
+		if (index < 0) {
+			index = 0;
 		}
+		else if (index > count -1) {
+			index = count - 1;
+		}
+		currentIndex = index;
+		updateOffset(0);
 	}
 
 	var scrollStart = null;
 	var scrollNow = 0;
 	var scrollPrev;
-	var prev, next, timePrev, velocity;
+	var timePrev, velocity;
 	var height = container.offsetHeight;
-	
-	
 
 	function touchstart (event) {
 		if (scrollStart === null) {
@@ -25,7 +28,7 @@ module.exports = function (container) {
 			scrollNow = scrollStart;
 			timePrev = new Date();
 			height = container.offsetHeight;
-			slides[currentIndex].style.transition = "none";
+			disableTransition();
 			event.preventDefault();
 		}
 	}
@@ -48,62 +51,41 @@ module.exports = function (container) {
 		if (scrollStart !== null) {
 			var diffTime = new Date() - timePrev;
 			var _velocity = (diffTime) ? (velocity / diffTime) : velocity;
-			var fast = (_velocity > 1);
-			resetOffset();
+			var fast = (_velocity > 0.5);
 			var scrollEndOffset = (scrollNow - scrollStart) / height * 100;
+			enableTransition();
 			snapOffset(scrollEndOffset, fast);
 			scrollStart = null;
 			event.preventDefault();
 		}
 	}
-	
-	function updateOffset (offset) {
-		if (offset < 0) {
-			if (currentIndex < slides.length - 1) {
-				if (!next) {
-					next = slides[currentIndex + 1];
-					next.style.transition = "none";
-				}
-			}
-		}
-		else {
-			if (currentIndex > 0) {
-				if (!prev) {
-					prev = slides[currentIndex - 1];
-					prev.style.transition = "none";
-				}
-			}
-		}
-		slides[currentIndex].style.transform = "translate3d(0, " + offset + "%, 0)";
-		if (next) {
-			next.style.transform = "translate3d(0, " + (offset + 100) + "%, 0)";
-		}
-		if (prev) {
-			prev.style.transform = "translate3d(0, " + (offset - 100) + "%, 0)";
-		}
+
+	function disableTransition () {
+		slides.style.transition = "none";
 	}
-	
+
+	function enableTransition () {
+		slides.style.transition = "";
+	}
+
+	function updateOffset (offset) {
+		//window.console && console.log("updateOffset", offset, currentIndex * -100 + offset);
+		slides.style.transform = "translate3d(0, " + (currentIndex * -100 + offset) + "%, 0)";
+	}
+
 	function snapOffset (offset, fast) {
+		var modifier = 0;
 		var direction = (offset > 0) ? -1 : 1;
 		offset = Math.abs(offset);
-		if ((fast && offset > 10) || offset > 25) {
-			go(currentIndex + direction);
+		if (fast && offset % 100 > 10) {
+			modifier = direction * Math.ceil(offset / 100);
 		}
-	}
-	
-	function resetOffset () {
-		slides[currentIndex].style.transition = "";
-		slides[currentIndex].style.transform = "";
-		if (prev) {
-			prev.style.transition = "";
-			prev.style.transform = "";
-			prev = null;
+		else {
+			modifier = direction * Math.round(offset / 100);
 		}
-		if (next) {
-			next.style.transition = "";
-			next.style.transform = "";
-			next = null;
-		}
+		window.console && console.log("snapOffset", direction, offset, modifier);
+
+		go(currentIndex + modifier);
 	}
 
 	var timer, interval = 100;
@@ -112,27 +94,31 @@ module.exports = function (container) {
 	var velocities = [];
 	var scrolling;
 	var incremental;
-	
+
 	function timeout () {
 		//scrolling = false;
 		timePrev = null;
 		velocity = 0;
 		timer = clearTimeout(timer);
-		resetOffset();
-		snapOffset(offsetY);
-		window.console && console.log("wheel end", incremental)
-		window.console && console.table(velocities);
-		velocities = [];
+		enableTransition();
+		snapOffset(offsetY / height * 100);
+		//window.console && console.log("wheel end", incremental)
+		//window.console && console.table(velocities);
+		//velocities = [];
 		lastY = 0;
 		incremental = false;
 	}
 
 	function wheel (event) {
 		var timeNow = new Date();
-		var y = event.deltaY;
+		var y = "wheelDelta" in event ? event.wheelDelta : event.deltaY;
+		if (event.webkitDirectionInvertedFromDevice) {
+			y = -y;
+		}
 		if (timer) {
+			/*
 			if (velocities.length === 0 && Math.abs(lastY) > 4 && Math.abs(lastY * 10 - y) > 0) {
-				incremental = true;
+				//incremental = true;
 			}
 			if (incremental) {
 				var _y = y;
@@ -140,17 +126,22 @@ module.exports = function (container) {
 				lastY = _y;
 			}
 			else {
+				*/
 				lastY = y;
-			}
+			//}
 			offsetY += y;
+			/*
 			velocity = (y) ? y / (timeNow - timePrev) : 0;
 			velocities.push([y, timeNow - timePrev, velocity]);
+			window.console && console.log("wheel", event);
+			*/
 		}
 		else {
 			offsetY = y;
 			height = container.offsetHeight;
-			velocities = [];
-			window.console && console.log("wheel start", y, event.deltaMode);
+			disableTransition();
+			//velocities = [];
+			//window.console && console.log("wheel start", y, event.deltaMode);
 		}
 		updateOffset(offsetY / height * 100);
 		timePrev = timeNow;

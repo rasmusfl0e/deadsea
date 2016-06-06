@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="utf-8"/>
-		<title>slide-thing</title>
+		<title>deadsea</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<style>
 			* {
@@ -16,11 +16,18 @@
 				height: 100%;
 				overflow: hidden;
 			}
+			.container {
+				height: 100%;
+				overflow: hidden;
+			}
 			.slides {
 				height: 100%;
+				overflow: visible;
+				transition: transform .3s ease-out;
 			}
 			.slide {
-				position: absolute;
+				position: relative;
+				float: left;
 				width: 100%;
 				height: 100%;
 				background-color: green;
@@ -46,23 +53,6 @@
 			.slide:nth-child(7) {
 				background-color: hsl(180, 100%, 50%);
 			}
-			.slide {
-				pointer-events: none;
-				transition: transform .3s ease-out;
-				transform: translate3d(0, -100%, 0);
-				z-index: 1;
-			}
-			.selected {
-				transform: translate3d(0, 0, 0);
-				z-index: 3;
-			}
-			.selected ~ .slide {
-				transform: translate3d(0, 100%, 0);
-				z-index: 1;
-			}
-			.selected + .slide {
-				z-index: 2;
-			}
 			p {
 				position: absolute;
 				bottom: 0;
@@ -77,32 +67,34 @@
 		</style>
 	</head>
 	<body>
-		<div class="slides">
-			<div class="slide selected">
-				<p>Testing 1</p>
-			</div>
-			<div class="slide">
-				<p>Testing 2</p>
-			</div>
-			<div class="slide">
-				<p>Testing 3</p>
-			</div>
-			<div class="slide">
-				<p>Testing 4</p>
-			</div>
-			<div class="slide">
-				<p>Testing 5</p>
-			</div>
-			<div class="slide">
-				<p>Testing 6</p>
-			</div>
-			<div class="slide">
-				<p>Testing 7</p>
+		<div class="container">
+			<div class="slides">
+				<div class="slide">
+					<p>Testing 1</p>
+				</div>
+				<div class="slide">
+					<p>Testing 2</p>
+				</div>
+				<div class="slide">
+					<p>Testing 3</p>
+				</div>
+				<div class="slide">
+					<p>Testing 4</p>
+				</div>
+				<div class="slide">
+					<p>Testing 5</p>
+				</div>
+				<div class="slide">
+					<p>Testing 6</p>
+				</div>
+				<div class="slide">
+					<p>Testing 7</p>
+				</div>
 			</div>
 		</div>
 		<script src="./dist/index.js"></script>
 		<script>
-			deadsea(document.querySelector(".slides"));
+			deadsea(document.querySelector(".container"));
 		</script>
 	</body>
 </html>
